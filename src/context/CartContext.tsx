@@ -20,15 +20,18 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") return [];
-    const saved = localStorage.getItem("carrito");
-    return saved ? JSON.parse(saved) : [];
-  });
+     const [items, setItems] = useState<CartItem[]>([]);
+   const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(items));
-  }, [items]);
+   useEffect(() => {
+     const saved = localStorage.getItem("cart");
+     if (saved) setItems(JSON.parse(saved));
+     setLoaded(true);
+   }, []);
+
+   useEffect(() => {
+     if (loaded) localStorage.setItem("cart", JSON.stringify(items));
+   }, [items, loaded]);
 
   function addItem(product: Product, quantity: number) {
     setItems([...items, { product, quantity }]);
