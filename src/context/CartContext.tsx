@@ -30,8 +30,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("cart", JSON.stringify(items));
   }, [items]);
 
-  function addItem(product: Product, quantity: number) {
-    setItems([...items, { product, quantity }]);
+    function addItem(product: Product, quantity: number) {
+    const exists = items.find((item) => item.product.id === product.id);
+    if (exists) {
+      setItems(
+        items.map((item) =>
+          item.product.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        )
+      );
+    } else {
+      setItems([...items, { product, quantity }]);
+    }
   }
 
   function removeItem(id: number) {
