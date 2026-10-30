@@ -8,17 +8,23 @@ import { formatPrice, FREE_SHIPPING_FROM, SHIPPING_COST } from "@/lib/format";
 export default function CarritoPage() {
   const { items, removeItem, updateQuantity } = useCart();
   const [coupon, setCoupon] = useState("");
-  const [discount, setDiscount] = useState(0);
+  const [discountRate, setDiscountRate] = useState(0);
+  const [couponError, setCouponError] = useState("");
 
   const subtotal = items.reduce((acc, item) => acc + item.product.price, 0);
+  const discount = Math.round(subtotal * discountRate);
   const shipping = subtotal >= FREE_SHIPPING_FROM ? 0 : SHIPPING_COST;
   const total = subtotal - discount + shipping;
 
-  function applyCoupon() {
-    if (coupon === "CAFE10") {
-      setDiscount(10);
-    }
+function applyCoupon() {
+  if (coupon.trim().toUpperCase() === "CAFE10") {
+    setDiscountRate(0.1);
+    setCouponError("");
+  } else {
+    setDiscountRate(0);
+    setCouponError("Cupón inválido");
   }
+}
 
   if (items.length === 0) {
     return (
@@ -77,19 +83,26 @@ export default function CarritoPage() {
       </table>
 
       <div className="mt-8 flex justify-between gap-10">
-        <div className="flex gap-2">
-          <input
-            value={coupon}
-            onChange={(e) => setCoupon(e.target.value)}
-            placeholder="Cupón"
-            className="rounded border px-3 py-2"
-          />
-          <button
-            onClick={applyCoupon}
-            className="rounded bg-gray-800 px-4 text-white"
-          >
-            Aplicar
-          </button>
+                <div>
+          <div className="flex gap-2">
+            <input
+              value={coupon}
+              onChange={(e) => setCoupon(e.target.value)}
+              placeholder="Cupón"
+              className="rounded border px-3 py-2"
+            />
+            <button
+              onClick={applyCoupon}
+              className="rounded bg-gray-800 px-4 text-white"
+            >
+              Aplicar
+            </button>
+          </div>
+          {couponError && (
+            <p role="alert" className="mt-2 text-red-500">
+              {couponError}
+            </p>
+          )}
         </div>
 
         <div className="w-72 space-y-1 text-right">
